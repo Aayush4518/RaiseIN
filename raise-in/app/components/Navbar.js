@@ -8,7 +8,7 @@ const Navbar = () => {
   const [open, setOpen] = useState(false)
 
   return (
-    <nav className="w-full h-16 shadow-md flex items-center justify-between px-6 bg-neutral-900/70 backdrop-blur-md border-b border-white/10 text-neutral-100 relative">
+    <nav className="w-full h-16 z-50 shadow-md flex items-center justify-between px-6 bg-neutral-900/70 backdrop-blur-md border-b border-white/10 text-neutral-100 relative">
       
       <div className="flex items-center gap-3">
         {/* Hamburger md device only*/}
