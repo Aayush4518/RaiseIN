@@ -29,8 +29,8 @@ export default function Home() {
             </TextReveal>
             
             <TextReveal delay={0.1} duration={0.7} distance={40}>
-              <p className="text-xl md:text-2xl text-white font-semibold">
-                Helping Hands, Changing Lives
+              <p className="text-[90px] md:text-[90px] leading-tight text-white w-full text-left ml-[-220px]">
+                Helping hands,<br />changing lives
               </p>
             </TextReveal>
             
