@@ -1,5 +1,21 @@
 @import "tailwindcss";
 
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 0;
+}
+
+body {
+  scroll-padding-top: 0;
+}
+
+* {
+  scroll-behavior: smooth;
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
 
 nextjs-portal{
   display: none !important;

@@ -2,6 +2,7 @@
 import ScrollSection from "@/app/components/ScrollSection";
 import StaggerChildren from "@/app/components/StaggerChildren";
 import TextReveal from "@/app/components/TextReveal";
+import ParallaxText from "@/app/components/ParallaxText";
 
 export default function Home() {
   return (
@@ -23,32 +24,40 @@ export default function Home() {
         >
           <div className="text-center space-y-6 max-w-4xl">
             <TextReveal delay={0} duration={0.7} distance={40}>
-              <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
-                RaiseIN
-              </h1>
+              <ParallaxText offset={150}>
+                <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
+                  RaiseIN
+                </h1>
+              </ParallaxText>
             </TextReveal>
             
             <TextReveal delay={0.1} duration={0.7} distance={40}>
-              <p className="text-[90px] md:text-[90px] leading-tight text-white w-full text-left ml-[-220px]">
-                Helping hands,<br />changing lives
-              </p>
+              <ParallaxText offset={120}>
+                <p className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl leading-tight text-white w-screen -ml-4 sm:-ml-4 md:-ml-4">
+                  Helping hands,<br />changing lives
+                </p>
+              </ParallaxText>
             </TextReveal>
             
             <TextReveal delay={0.2} duration={0.7} distance={40}>
-              <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-                Join our community of changemakers dedicated to making a positive impact in the world. Together, we can create meaningful change.
-              </p>
+              <ParallaxText offset={100}>
+                <p className="text-sm sm:text-base md:text-lg text-gray-400 max-w-2xl mx-auto px-4">
+                  Join our community of changemakers dedicated to making a positive impact in the world. Together, we can create meaningful change.
+                </p>
+              </ParallaxText>
             </TextReveal>
 
             <TextReveal delay={0.3} duration={0.7} distance={30}>
-              <div className="flex gap-4 justify-center pt-8 flex-wrap">
-                <button className="px-8 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg font-semibold transition-colors">
-                  Get Started
-                </button>
-                <button className="px-8 py-3 border border-purple-600 text-purple-400 hover:bg-purple-600 hover:text-white rounded-lg font-semibold transition-colors">
-                  Learn More
-                </button>
-              </div>
+              <ParallaxText offset={80}>
+                <div className="flex gap-4 justify-center pt-8 flex-wrap">
+                  <button className="px-8 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg font-semibold transition-colors">
+                    Get Started
+                  </button>
+                  <button className="px-8 py-3 border border-purple-600 text-purple-400 hover:bg-purple-600 hover:text-white rounded-lg font-semibold transition-colors">
+                    Learn More
+                  </button>
+                </div>
+              </ParallaxText>
             </TextReveal>
           </div>
         </ScrollSection>
@@ -130,7 +139,10 @@ export default function Home() {
             </button>
           </TextReveal>
         </div>
+
       </ScrollSection>
+            
+      
     </div>
   );
 }
