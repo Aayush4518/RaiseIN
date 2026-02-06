@@ -1,4 +1,5 @@
   "use client"
+  
   import Link from "next/link"
   import { useState, useEffect } from "react"
 
@@ -54,16 +55,14 @@
 
 
           
-          {isScrolled && (
-            <>
-              <button className="px-4 py-2 border border-black rounded-full bg-transparent text-black hover:bg-black hover:text-white transition-all">
-                Login
-              </button>
-              <button className="px-4 py-2 border border-black rounded-full bg-black text-white hover:bg-white hover:text-black transition-all">
-                Sign Up
-              </button>
-            </>
-          )}
+          <>
+            <Link href={"/login"} className={`px-4 py-2 rounded-full transition-all border ${isScrolled ? "border-black text-black hover:bg-black hover:text-white" : "border-white text-white hover:bg-white hover:text-black"}`}>
+              Login
+            </Link>
+            <Link href={"/login"} className={`px-4 py-2 rounded-full transition-all ${isScrolled ? "bg-black text-white border-black hover:bg-white hover:text-black" : "bg-black text-white border-white hover:bg-transparent hover:text-white"}`}>
+              Sign Up
+            </Link>
+          </>
         </div>
 
         {/* MOBILE VIEW */}
@@ -78,21 +77,14 @@
               <Link href="/about" onClick={() => setOpen(false)}>About</Link>
               <Link href="/services" onClick={() => setOpen(false)}>Services</Link>
               <Link href="/contact" onClick={() => setOpen(false)}>Contact</Link>
-              {isScrolled ? (
-                <>
-                  <button className="px-4 py-2 border border-black rounded-full bg-transparent text-black hover:bg-black hover:text-white transition-all w-full">
-                    Login
-                  </button>
-                  <button className="px-4 py-2 border border-black rounded-full bg-black text-white hover:bg-white hover:text-black transition-all w-full">
-                    Sign Up
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button>Login</button>
-                  <button>Sign Up</button>
-                </>
-              )}
+              <>
+                <Link href={"/login"} className={`px-4 py-2 rounded-full transition-all w-full border ${isScrolled ? "border-black text-black hover:bg-black hover:text-white" : "border-white text-white hover:bg-white hover:text-black"}`} onClick={() => setOpen(false)}>
+                  Login
+                </Link>
+                <Link href={"/login"} className={`px-4 py-2 rounded-full transition-all w-full ${isScrolled ? "bg-black text-white border-black hover:bg-white hover:text-black" : "bg-white text-black border-white hover:bg-transparent hover:text-white"}`} onClick={() => setOpen(false)}>
+                  Sign Up
+                </Link>
+              </>
             </div>
           </div>
         )}
