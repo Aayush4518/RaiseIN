@@ -56,12 +56,12 @@
 
           
           <>
-            <Link href={"/login"} className={`px-4 py-2 rounded-full transition-all border ${isScrolled ? "border-black text-black hover:bg-black hover:text-white" : "border-white text-white hover:bg-white hover:text-black"}`}>
+            <button onClick={() => window.location.assign("/login")} className={`px-4 py-2 cursor-pointer rounded-full transition-all border ${isScrolled ? "border-black text-black hover:bg-black hover:text-white" : "border-white text-white hover:bg-white hover:text-black"}`}>
               Login
-            </Link>
-            <Link href={"/login"} className={`px-4 py-2 rounded-full transition-all ${isScrolled ? "bg-black text-white border-black hover:bg-white hover:text-black" : "bg-black text-white border-white hover:bg-transparent hover:text-white"}`}>
+            </button>
+            <button onClick={() => window.location.assign("/login")} className={`px-4 py-2 rounded-full cursor-pointer transition-all ${isScrolled ? "bg-black text-white border-black hover:bg-white hover:text-black" : "bg-black text-white border-white hover:bg-transparent hover:text-white"}`}>
               Sign Up
-            </Link>
+            </button>
           </>
         </div>
 
@@ -78,12 +78,12 @@
               <Link href="/services" onClick={() => setOpen(false)}>Services</Link>
               <Link href="/contact" onClick={() => setOpen(false)}>Contact</Link>
               <>
-                <Link href={"/login"} className={`px-4 py-2 rounded-full transition-all w-full border ${isScrolled ? "border-black text-black hover:bg-black hover:text-white" : "border-white text-white hover:bg-white hover:text-black"}`} onClick={() => setOpen(false)}>
+                <button onClick={() => window.location.assign("/login")} className={`px-4 py-2 rounded-full transition-all w-full border ${isScrolled ? "border-black text-black hover:bg-black hover:text-white" : "border-white text-white hover:bg-white hover:text-black"}`}>
                   Login
-                </Link>
-                <Link href={"/login"} className={`px-4 py-2 rounded-full transition-all w-full ${isScrolled ? "bg-black text-white border-black hover:bg-white hover:text-black" : "bg-white text-black border-white hover:bg-transparent hover:text-white"}`} onClick={() => setOpen(false)}>
+                </button>
+                <button onClick={() => window.location.assign("/login")} className={`px-4 py-2 rounded-full transition-all w-full ${isScrolled ? "bg-black text-white border-black hover:bg-white hover:text-black" : "bg-white text-black border-white hover:bg-transparent hover:text-white"}`}>
                   Sign Up
-                </Link>
+                </button>
               </>
             </div>
           </div>
