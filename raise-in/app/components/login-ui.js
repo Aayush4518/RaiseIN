@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { useSession, signIn, signOut } from "next-auth/react"
 
 import * as THREE from "three";
 
@@ -332,7 +333,7 @@ const AnimatedNavLink = ({
   );
 };
 
-function MiniNavbar() {
+function MiniNavbar({ onAuthClick }) {
   const [isOpen, setIsOpen] = useState(false);
   const [headerShapeClass, setHeaderShapeClass] = useState('rounded-full');
   const shapeTimeoutRef = useRef(null);
@@ -375,13 +376,14 @@ function MiniNavbar() {
   );
 
   const navLinksData = [
-    { label: 'Manifesto', href: '#1' },
-    { label: 'Careers', href: '#2' },
-    { label: 'Discover', href: '#3' },
+    { label: 'Manifesto', href: '/' },
+    { label: 'Careers', href: '/' },
+    { label: 'Discover', href: '/' },
   ];
 
   const loginButtonElement = (
     <button
+      onClick={() => onAuthClick && onAuthClick('Please login')}
       className="px-4 py-2 sm:px-3 text-xs sm:text-sm border border-[#333] bg-[rgba(31,31,31,0.62)] text-gray-300 rounded-full hover:border-white/50 hover:text-white transition-colors duration-200 w-full sm:w-auto">
       LogIn
     </button>
@@ -397,6 +399,7 @@ function MiniNavbar() {
                        transition-all duration-300 ease-out
                        group-hover:opacity-60 group-hover:blur-xl group-hover:-m-3"></div>
        <button
+         onClick={() => onAuthClick && onAuthClick('Please signup')}
          className="relative z-10 px-4 py-2 sm:px-3 text-xs sm:text-sm font-semibold text-black bg-gradient-to-br from-gray-100 to-gray-300 rounded-full hover:from-gray-200 hover:to-gray-400 transition-all duration-200 w-full sm:w-auto">
          Signup
        </button>
@@ -491,6 +494,7 @@ export const SignInPage = ({
   const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
   const [initialCanvasVisible, setInitialCanvasVisible] = useState(true);
   const [reverseCanvasVisible, setReverseCanvasVisible] = useState(false);
+  const [authMessage, setAuthMessage] = useState("");
 
   const handleEmailSubmit = (e) => {
     e.preventDefault();
@@ -596,7 +600,7 @@ export const SignInPage = ({
       {/* Content Layer */}
       <div className="relative z-10 flex flex-col flex-1">
         {/* Top navigation */}
-        <MiniNavbar />
+        <MiniNavbar onAuthClick={setAuthMessage} />
 
         {/* Main content container */}
         <div className="flex flex-1 flex-col lg:flex-row ">
@@ -614,16 +618,20 @@ export const SignInPage = ({
                     className="space-y-6 text-center">
                     <div className="space-y-1">
                       <h1
-                        className="text-[2.5rem] font-bold leading-[1.1] tracking-tight text-white">Welcome Developer</h1>
-                      <p className="text-[1.8rem] text-white/70 font-light">Your sign in component</p>
+                        className="text-[2.5rem] font-bold leading-[1.1] tracking-tight text-white">Welcome User</h1>
+                      <p className="text-[1.8rem] text-white/70 font-light">Choose your Sign-In</p>
+                      {authMessage && (
+                        <p className="text-[1rem] text-white/60 font-medium">{authMessage}</p>
+                      )}
                     </div>
                     
                     
                     <div className="space-y-4">
                       <button
+                        onClick={() => signIn('github', { callbackUrl: '/home' })}
                         className="backdrop-blur-[2px] w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-full py-3 px-4 transition-colors">
-                        <span className="text-lg">G</span>
-                        <span>Sign in with Google</span>
+                        <span className="text-lg">⚙️</span>
+                        <span>Sign in with GitHub</span>
                       </button>
                       
                       <div className="flex items-center gap-4">

@@ -4,6 +4,7 @@ import "./globals.css";
 import NavbarWrapper from './components/NavbarWrapper';
 import FooterWrapper from './components/FooterWrapper';
 import ContentWrapper from './components/ContentWrapper';
+import SessionWrapper from './components/SessionWrapper';
 const raleway = Raleway({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
@@ -19,11 +20,13 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${raleway.className} overflow-x-hidden`}>
-        <NavbarWrapper/>
-        <ContentWrapper>
-          {children}
-        </ContentWrapper>
-        <FooterWrapper/>
+        <SessionWrapper>
+          <NavbarWrapper/>
+          <ContentWrapper>
+            {children}
+          </ContentWrapper>
+          <FooterWrapper/>
+        </SessionWrapper>
       </body>
     </html>
   )
