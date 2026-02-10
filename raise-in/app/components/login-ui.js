@@ -630,7 +630,7 @@ export const SignInPage = ({
                       <button
                         onClick={() => signIn('github', { callbackUrl: '/home' })}
                         className="backdrop-blur-[2px] w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-full py-3 px-4 transition-colors">
-                        <span className="text-lg"> <img className="w-7 " src="https://pngimg.com/uploads/github/github_PNG40.png" alt="GitHubLogo" /> </span>
+                        <span className="text-lg"> <img className="w-7 invert" src="https://pngimg.com/uploads/github/github_PNG40.png" alt="GitHubLogo" /> </span>
                         <span>Sign in with GitHub</span>
                       </button>
                       <button
@@ -656,6 +656,8 @@ export const SignInPage = ({
                             className="w-full backdrop-blur-[1px] text-white border-1 border-white/10 rounded-full py-3 px-4 focus:outline-none focus:border focus:border-white/30 text-center"
                             required />
                           <button
+                            onClick={()=> signIn("email", { email, callbackUrl:"/home" })}
+                            
                             type="submit"
                             className="absolute right-1.5 top-1.5 text-white w-9 h-9 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors group overflow-hidden">
                             <span className="relative w-full h-full block overflow-hidden">
