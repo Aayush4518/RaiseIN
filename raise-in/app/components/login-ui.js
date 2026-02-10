@@ -630,8 +630,14 @@ export const SignInPage = ({
                       <button
                         onClick={() => signIn('github', { callbackUrl: '/home' })}
                         className="backdrop-blur-[2px] w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-full py-3 px-4 transition-colors">
-                        <span className="text-lg">⚙️</span>
+                        <span className="text-lg"> <img className="w-7 " src="https://pngimg.com/uploads/github/github_PNG40.png" alt="GitHubLogo" /> </span>
                         <span>Sign in with GitHub</span>
+                      </button>
+                      <button
+                        onClick={() => signIn('google', { callbackUrl: '/home' })}
+                        className="backdrop-blur-[2px] w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-full py-3 px-4 transition-colors">
+                        <span className="text-lg"> <img className="w-7" src="https://logos-world.net/wp-content/uploads/2020/09/Google-Symbol.png" alt="GoogleLogo"/> </span>
+                        <span>Sign in with Google</span>
                       </button>
                       
                       <div className="flex items-center gap-4">
