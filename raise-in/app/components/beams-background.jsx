@@ -1,162 +1,58 @@
-"use client";;
-import { useEffect, useRef } from "react";
+"use client";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 
-function createBeam(width, height) {
-    const angle = -35 + Math.random() * 10;
-    return {
-        x: Math.random() * width * 1.5 - width * 0.25,
-        y: Math.random() * height * 1.5 - height * 0.25,
-        width: 20 + Math.random() * 40,
-        length: height * 1.2,
-        angle: angle,
-        speed: 0.6 + Math.random() * 1.2,
-        opacity: 0.12 + Math.random() * 0.16,
-        hue: 190 + Math.random() * 70,
-        pulse: Math.random() * Math.PI * 2,
-        pulseSpeed: 0.02 + Math.random() * 0.03,
-    };
-}
-
-export function BeamsBackground({
-    className,
-    intensity = "strong",
-    children,
-}) {
-    const canvasRef = useRef(null);
-    const beamsRef = useRef([]);
-    const animationFrameRef = useRef(0);
-    const MINIMUM_BEAMS = 20;
-
-    const opacityMap = {
-        subtle: 0.7,
-        medium: 0.85,
-        strong: 1,
-    };
-
-    useEffect(() => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-
-        const ctx = canvas.getContext("2d");
-        if (!ctx) return;
-
-        const updateCanvasSize = () => {
-            const dpr = window.devicePixelRatio || 1;
-            const cssWidth = window.innerWidth;
-            const cssHeight = window.innerHeight;
-            canvas.width = cssWidth * dpr;
-            canvas.height = cssHeight * dpr;
-            canvas.style.width = `${cssWidth}px`;
-            canvas.style.height = `${cssHeight}px`;
-            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-            const totalBeams = Math.round(MINIMUM_BEAMS * 1.5);
-            beamsRef.current = Array.from({ length: totalBeams }, () =>
-                createBeam(cssWidth, cssHeight));
-        };
-
-        updateCanvasSize();
-        window.addEventListener("resize", updateCanvasSize);
-
-        function resetBeam(beam, index, totalBeams) {
-            if (!canvas) return beam;
-            
-            const column = index % 3;
-            const spacing = window.innerWidth / 3;
-
-            beam.y = window.innerHeight + 100;
-            beam.x =
-                column * spacing +
-                spacing / 2 +
-                (Math.random() - 0.5) * spacing * 0.5;
-            beam.width = 60 + Math.random() * 60;
-            beam.speed = 0.5 + Math.random() * 0.4;
-            beam.hue = 190 + (index * 70) / totalBeams;
-            beam.opacity = 0.2 + Math.random() * 0.1;
-            return beam;
-        }
-
-        function drawBeam(ctx, beam) {
-            ctx.save();
-            ctx.translate(beam.x, beam.y);
-            ctx.rotate((beam.angle * Math.PI) / 180);
-
-            // Calculate pulsing opacity
-            const pulsingOpacity =
-                beam.opacity *
-                (0.8 + Math.sin(beam.pulse) * 0.2) *
-                opacityMap[intensity];
-
-            const gradient = ctx.createLinearGradient(0, 0, 0, beam.length);
-
-            // Enhanced gradient with multiple color stops
-            gradient.addColorStop(0, `hsla(${beam.hue}, 85%, 65%, 0)`);
-            gradient.addColorStop(0.1, `hsla(${beam.hue}, 85%, 65%, ${pulsingOpacity * 0.5})`);
-            gradient.addColorStop(0.4, `hsla(${beam.hue}, 85%, 65%, ${pulsingOpacity})`);
-            gradient.addColorStop(0.6, `hsla(${beam.hue}, 85%, 65%, ${pulsingOpacity})`);
-            gradient.addColorStop(0.9, `hsla(${beam.hue}, 85%, 65%, ${pulsingOpacity * 0.5})`);
-            gradient.addColorStop(1, `hsla(${beam.hue}, 85%, 65%, 0)`);
-
-            ctx.fillStyle = gradient;
-            ctx.fillRect(-beam.width / 2, 0, beam.width, beam.length);
-            ctx.restore();
-        }
-
-        function animate() {
-            if (!canvas || !ctx) return;
-
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.filter = "blur(35px)";
-
-            const totalBeams = beamsRef.current.length;
-            beamsRef.current.forEach((beam, index) => {
-                beam.y -= beam.speed;
-                beam.pulse += beam.pulseSpeed;
-
-                // Reset beam when it goes off screen
-                if (beam.y + beam.length < -100) {
-                    resetBeam(beam, index, totalBeams);
-                }
-
-                drawBeam(ctx, beam);
-            });
-
-            animationFrameRef.current = requestAnimationFrame(animate);
-        }
-
-        animate();
-
-        return () => {
-            window.removeEventListener("resize", updateCanvasSize);
-            if (animationFrameRef.current) {
-                cancelAnimationFrame(animationFrameRef.current);
-            }
-        };
-    }, [intensity]);
+export function BeamsBackground({ className, intensity = "medium", children }) {
+    // Lightweight SVG-based background to replace expensive canvas
+    // No window/navigator access here to avoid hydration mismatches
+    const svgOpacity = intensity === "subtle" ? 0.12 : intensity === "strong" ? 0.22 : 0.16;
 
     return (
-        <div
-            className={cn("relative min-h-screen w-full overflow-hidden bg-transparent", className)}>
+        <div className={cn("relative min-h-screen w-full overflow-hidden bg-transparent", className)}>
             <div className="fixed inset-0 -z-20 bg-neutral-950" />
-            <canvas
-                ref={canvasRef}
-                className="fixed inset-0 -z-10"
-                style={{ filter: "blur(15px)" }} />
-            <motion.div
-                className="fixed inset-0 -z-10 bg-neutral-950/5"
-                animate={{
-                    opacity: [0.05, 0.15, 0.05],
-                }}
-                transition={{
-                    duration: 10,
-                    ease: "easeInOut",
-                    repeat: Number.POSITIVE_INFINITY,
-                }}
-                style={{
-                    backdropFilter: "blur(50px)",
-                }} />
+
+            <svg
+                className="fixed inset-0 -z-10 w-full h-full"
+                preserveAspectRatio="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+            >
+                <defs>
+                    <linearGradient id="g1" x1="0" x2="1" y1="0" y2="1">
+                        <stop offset="0%" stopColor="#0f172a" stopOpacity="0" />
+                        <stop offset="40%" stopColor="#0ea5e9" stopOpacity={svgOpacity} />
+                        <stop offset="100%" stopColor="#7c3aed" stopOpacity="0" />
+                    </linearGradient>
+                    <linearGradient id="g2" x1="1" x2="0" y1="0" y2="1">
+                        <stop offset="0%" stopColor="#0ea5e9" stopOpacity="0" />
+                        <stop offset="50%" stopColor="#60a5fa" stopOpacity={svgOpacity * 0.8} />
+                        <stop offset="100%" stopColor="#0f172a" stopOpacity="0" />
+                    </linearGradient>
+                </defs>
+
+                <rect width="100%" height="100%" fill="url(#g1)" />
+                <rect
+                    width="140%"
+                    height="60%"
+                    x="-20%"
+                    y="20%"
+                    transform="rotate(-18 50 50)"
+                    fill="url(#g2)"
+                    opacity={svgOpacity}
+                />
+                <rect
+                    width="120%"
+                    height="50%"
+                    x="-10%"
+                    y="50%"
+                    transform="rotate(-30 50 50)"
+                    fill="#0ea5e9"
+                    opacity={svgOpacity * 0.5}
+                />
+            </svg>
+
+            <div className="fixed inset-0 -z-10 bg-neutral-950/5" style={{ opacity: 0.06 }} />
+
             <div className="relative z-10 flex h-screen w-full items-center justify-center">
                 {children ? (
                     children
