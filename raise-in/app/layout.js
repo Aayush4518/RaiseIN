@@ -5,6 +5,7 @@ import NavbarWrapper from './components/NavbarWrapper';
 import FooterWrapper from './components/FooterWrapper';
 import ContentWrapper from './components/ContentWrapper';
 import SessionWrapper from './components/SessionWrapper';
+import Providers from "./providers";
 const raleway = Raleway({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
