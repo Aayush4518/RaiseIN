@@ -46,28 +46,26 @@ export const MinimalProfessionalCard = () => {
     const strokeDashoffset = circumference - (circumference * progress) / 100;
 
   return (
-      <div
-          className={`min-h-screen transition-colors duration-500 flex items-center justify-center w-full p-8 ${
-                 isDarkMode 
-                     ? 'bg-gradient-to-br from-gray-900 to-gray-950' 
-                     : 'bg-gradient-to-br from-gray-50 to-gray-100'
-             }`}>
-          <div
-              ref={cardRef}
-              className={`w-full max-w-lg rounded-2xl p-8 transition-all duration-300 ease-out ${
-                  isDarkMode 
-                      ? 'bg-gray-800/90 shadow-[0_1px_3px_rgba(0,0,0,0.3),0_10px_40px_rgba(0,0,0,0.4)] hover:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_20px_60px_rgba(0,0,0,0.6)]'
-                      : 'bg-white shadow-[0_1px_3px_rgba(0,0,0,0.05),0_10px_40px_rgba(0,0,0,0.08)] hover:shadow-[0_1px_3px_rgba(0,0,0,0.05),0_20px_60px_rgba(0,0,0,0.15)]'
-              }`}
-              style={{ transformStyle: 'preserve-3d' }}>
+      <div className="fixed inset-0 w-full bg-slate-950">
+          <div className="absolute bottom-0 left-0 right-0 top-0 bg-[radial-gradient(circle_500px_at_50%_200px,#3e3e3e,transparent)]"></div>
+          
+          <div className="relative min-h-screen flex items-center justify-center w-full p-8">
+              <div
+                  ref={cardRef}
+                  className={`w-full max-w-lg rounded-2xl p-8 transition-all duration-300 ease-out ${
+                      isDarkMode 
+                          ? 'bg-gray-800/90 shadow-[0_1px_3px_rgba(0,0,0,0.3),0_10px_40px_rgba(0,0,0,0.4)] hover:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_20px_60px_rgba(0,0,0,0.6)]'
+                          : 'bg-white shadow-[0_1px_3px_rgba(0,0,0,0.05),0_10px_40px_rgba(0,0,0,0.08)] hover:shadow-[0_1px_3px_rgba(0,0,0,0.05),0_20px_60px_rgba(0,0,0,0.15)]'
+                  }`}
+                  style={{ transformStyle: 'preserve-3d' }}>
               <div className="flex items-start justify-between mb-8">
                   <div>
                       <h1
                           className={`text-2xl font-semibold mb-1 ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>
-                          Analytics Dashboard
+                          Campaign Performance
                       </h1>
                       <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                          Performance metrics at a glance
+                          Crowdfunding insights & progress tracking
                       </p>
                   </div>
                   <div className="flex items-center gap-4">
@@ -146,7 +144,7 @@ export const MinimalProfessionalCard = () => {
               <div className="mb-6">
                   <div
                       className={`flex space-x-1 relative border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-                      {['overview', 'analytics', 'reports'].map((tab) => (
+                      {['overview', 'campaigns', 'supporters'].map((tab) => (
                           <button
                               key={tab}
                               onClick={() => setActiveTab(tab)}
@@ -163,7 +161,7 @@ export const MinimalProfessionalCard = () => {
                       <div
                           className="absolute bottom-0 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300 ease-in-out"
                           style={{
-                              left: activeTab === 'overview' ? '0px' : activeTab === 'analytics' ? '96px' : '192px',
+                              left: activeTab === 'overview' ? '0px' : activeTab === 'campaigns' ? '96px' : '192px',
                               width: '96px'
                           }} />
                   </div>
@@ -179,18 +177,18 @@ export const MinimalProfessionalCard = () => {
                                       : 'bg-gray-50 border-gray-100'
                               }`}>
                               <div className="flex justify-between items-center mb-2">
-                                  <span className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Monthly Revenue</span>
+                                  <span className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Total Funds Raised</span>
                                   <span
                                       className={`text-xs px-2 py-1 rounded-full ${
                                           isDarkMode 
                                               ? 'text-green-400 bg-green-900/30' 
                                               : 'text-green-600 bg-green-50'
                                       }`}>
-                                      +12.5%
+                                      +18.3%
                                   </span>
                               </div>
                               <p
-                                  className={`text-2xl font-semibold ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>$24,780</p>
+                                  className={`text-2xl font-semibold ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>$1.2M</p>
                               <div
                                   className={`mt-3 h-1.5 rounded-full overflow-hidden ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}>
                                   <div
@@ -201,9 +199,9 @@ export const MinimalProfessionalCard = () => {
 
                           <div className="grid grid-cols-3 gap-3">
                               {[
-                                  { label: 'Users', value: '1,428' },
-                                  { label: 'Sessions', value: '3,942' },
-                                  { label: 'Conversion', value: '4.2%' }
+                                  { label: 'Active Campaigns', value: '24' },
+                                  { label: 'Total Backers', value: '3,847' },
+                                  { label: 'Success Rate', value: '76%' }
                               ].map((metric) => (
                                   <div
                                       key={metric.label}
@@ -222,13 +220,13 @@ export const MinimalProfessionalCard = () => {
                       </>
                   )}
 
-                  {activeTab === 'analytics' && (
+                  {activeTab === 'campaigns' && (
                       <div className="space-y-3">
                           {[
-                              { color: 'bg-blue-500', label: 'Page Views', value: '45,293' },
-                              { color: 'bg-purple-500', label: 'Unique Visitors', value: '12,847' },
-                              { color: 'bg-green-500', label: 'Bounce Rate', value: '32.4%' },
-                              { color: 'bg-amber-500', label: 'Avg. Session', value: '3m 42s' }
+                              { color: 'bg-green-500', label: 'Funded Projects', value: '18' },
+                              { color: 'bg-blue-500', label: 'In Progress', value: '6' },
+                              { color: 'bg-amber-500', label: 'Avg. Funding Goal', value: '$52,400' },
+                              { color: 'bg-purple-500', label: 'Top Category', value: 'Tech' }
                           ].map((item, index) => (
                               <div
                                   key={item.label}
@@ -246,7 +244,7 @@ export const MinimalProfessionalCard = () => {
                       </div>
                   )}
 
-                  {activeTab === 'reports' && (
+                  {activeTab === 'supporters' && (
                       <div className="space-y-3">
                           <div
                               className={`rounded-lg p-4 border ${
@@ -255,10 +253,10 @@ export const MinimalProfessionalCard = () => {
                                       : 'bg-gradient-to-r from-blue-50 to-purple-50 border-gray-100'
                               }`}>
                               <h3
-                                  className={`text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>Weekly Summary</h3>
+                                  className={`text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>Backer Trends</h3>
                               <p
                                   className={`text-xs leading-relaxed ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                  Performance increased by 23% compared to last week. User engagement metrics show positive trends across all channels.
+                                  Average pledge increased 15% this month. New backer registrations trending upward with strong engagement on tech projects.
                               </p>
                           </div>
                           <div
@@ -268,12 +266,12 @@ export const MinimalProfessionalCard = () => {
                                       : 'bg-gray-50 border-gray-100'
                               }`}>
                               <h3
-                                  className={`text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>Key Insights</h3>
+                                  className={`text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>Key Metrics</h3>
                               <ul className="space-y-2">
                                   {[
-                                      'Mobile traffic up 18%',
-                                      'Peak hours: 2-4 PM EST',
-                                      'Top source: Organic search'
+                                      'Avg. pledge amount: $145',
+                                      'Repeat backer rate: 34%',
+                                      'Top pledged category: Creative'
                                   ].map((insight) => (
                                       <li key={insight} className="flex items-start space-x-2">
                                           <span
@@ -290,7 +288,7 @@ export const MinimalProfessionalCard = () => {
               <div className="mt-8 flex gap-3">
                   <button
                       className="flex-1 py-2.5 px-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg font-medium text-sm hover:from-blue-600 hover:to-purple-600 transition-all duration-200 shadow-sm hover:shadow-md">
-                      View Details
+                      View All Campaigns
                   </button>
                   <button
                       className={`flex-1 py-2.5 px-4 rounded-lg font-medium text-sm transition-all duration-200 border ${
@@ -298,8 +296,9 @@ export const MinimalProfessionalCard = () => {
                               ? 'bg-gray-800 text-gray-300 hover:bg-gray-700 border-gray-600' 
                               : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-200'
                       }`}>
-                      Export
+                      Download Report
                   </button>
+              </div>
               </div>
           </div>
       </div>
