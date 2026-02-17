@@ -6,7 +6,7 @@ export default function ContentWrapper({ children }) {
   const isLoginPage = pathname.startsWith('/login');
   
   return (
-    <div className={`w-full ${!isLoginPage ? 'pt-16' : ''}`}>
+    <div className={`w-full ${!isLoginPage ? 'pt-16' : ''} min-h-screen`}>
       {children}
     </div>
   );
