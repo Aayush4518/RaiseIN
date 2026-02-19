@@ -2,10 +2,25 @@
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-
 export default function Page() {
-  const { data: session, status } = useSession();
+  const { data: session, status } = useSession(); 
   const [myFundings, setMyFundings] = useState([]);
+
+  // Delete a funding owned by the current user
+  const handleDelete = (id) => {
+    try {
+      const allFundings = JSON.parse(localStorage.getItem("fundings") || "[]");
+      const updatedFundings = allFundings.filter((f) => f.id !== id);
+      localStorage.setItem("fundings", JSON.stringify(updatedFundings));
+      const updatedMyFundings = updatedFundings.filter(
+        (f) => f.creator?.email === session?.user?.email
+      );
+      setMyFundings(updatedMyFundings);
+    } catch (err) {
+      console.error("Failed to delete funding", err);
+    }
+  };
+  // const creatorID = session?.user?.email;
 
   useEffect(() => {
     if (session?.user?.email) {
@@ -77,6 +92,7 @@ export default function Page() {
                 <Link href="/home" className="px-6 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg hover:shadow-lg hover:shadow-blue-500/50 transition-all">
                   Create New
                 </Link>
+                
               </div>
 
               {myFundings.length === 0 ? (
@@ -115,6 +131,23 @@ export default function Page() {
                                   </svg>
                                 </div>
                               )}
+                              {/* Delete button (owner only) */}
+                              {session?.user?.email === funding.creator?.email && (
+                                <button
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    handleDelete(funding.id);
+                                  }}
+                                  className="absolute top-3 left-3 p-1 bg-red-600 hover:bg-red-700 rounded-full text-white z-20"
+                                  aria-label="Delete campaign"
+                                >
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                  </svg>
+                                </button>
+                              )}
+
                               <div className="absolute top-3 right-3">
                                 <span className="px-3 py-1 bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-xs font-semibold rounded-full">
                                   {funding.category}

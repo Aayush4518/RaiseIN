@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+// import { handleDelete } from "@/app/dashboard/page";
 
 export default function FundingDetail() {
   const params = useParams();
@@ -12,6 +13,7 @@ export default function FundingDetail() {
   const [loading, setLoading] = useState(true);
   const [donationAmount, setDonationAmount] = useState("");
   const [showDonationForm, setShowDonationForm] = useState(false);
+  
 
   useEffect(() => {
     if (!slug) return;
@@ -223,6 +225,7 @@ export default function FundingDetail() {
                   >
                     Donate Now
                   </button>
+                  
                 ) : (
                   <form onSubmit={handleDonate} className="space-y-4">
                     <div>
@@ -252,6 +255,12 @@ export default function FundingDetail() {
                     </button>
                   </form>
                 )}
+                {/* <button
+                    onClick={()=>handleDelete(funding.id)}
+                    className="w-full mt-3 py-3 bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold rounded-lg hover:shadow-lg hover:shadow-red-500/50 transition-all"
+                  >
+                    Withdraw Campaign
+                  </button> */}
 
                 {/* Share Buttons */}
                 <div className="mt-6 pt-6 border-t border-gray-700">
