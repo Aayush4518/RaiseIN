@@ -40,6 +40,10 @@ const authOptions = {
             email: user.email,
             profilePicture: profile?.avatar_url || user.image || null,
           });
+          
+        }
+        else {
+          
         }
 
         return true;

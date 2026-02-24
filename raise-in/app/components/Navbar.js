@@ -43,7 +43,7 @@
               />
             </button>
 
-            <span className="text-lg font-semibold">RaiseIN</span>
+            <Link href={"/home"} className="text-lg font-semibold">RaiseIN</Link>
           </div>
 
           {/* DESKTOP VIEW */}

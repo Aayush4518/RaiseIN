@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 // import { handleDelete } from "@/app/dashboard/page";
+import PayButton from "@/app/components/payment";
 
 export default function FundingDetail() {
   const params = useParams();
@@ -13,7 +14,7 @@ export default function FundingDetail() {
   const [loading, setLoading] = useState(true);
   const [donationAmount, setDonationAmount] = useState("");
   const [showDonationForm, setShowDonationForm] = useState(false);
-  
+
 
   useEffect(() => {
     if (!slug) return;
@@ -219,16 +220,21 @@ export default function FundingDetail() {
 
                 {/* Donation Button */}
                 {!showDonationForm ? (
-                  <button
-                    onClick={() => setShowDonationForm(true)}
-                    className="w-full py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold rounded-lg hover:shadow-lg hover:shadow-blue-500/50 transition-all"
-                  >
-                    Donate Now
-                  </button>
-                  
+                  <>
+                    <button
+                      onClick={() => setShowDonationForm(true)}
+                      className="w-full py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold rounded-lg hover:shadow-lg hover:shadow-blue-500/50 transition-all"
+                    >
+                      Choose Donation Amount
+                    </button>
+                    <div className="mt-4 text-center">
+                      <p className="text-sm text-gray-400 mb-2">Pay remaining {formatCurrency(amountNeeded)}</p>
+                      <PayButton amount={amountNeeded} description={`Support ${funding.title}`} />
+                    </div>
+                  </>
+
                 ) : (
                   <form onSubmit={handleDonate} className="space-y-4">
-                    <div>
                       <label className="block text-sm font-medium text-gray-300 mb-2">Amount (₹)</label>
                       <input
                         type="number"
@@ -236,16 +242,13 @@ export default function FundingDetail() {
                         onChange={(e) => setDonationAmount(e.target.value)}
                         placeholder="Enter amount"
                         className="w-full px-4 py-2 bg-gray-900 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
-                        required
-                        autoFocus
-                      />
+                          required
+                          autoFocus
+                        />
+                    <div className="flex flex-col gap-3">
+                      <div className="text-sm text-gray-300">Donate: <span className="font-semibold text-white">{donationAmount ? `₹${donationAmount}` : formatCurrency(amountNeeded)}</span></div>
+                      <PayButton amount={donationAmount ? Number(donationAmount) : amountNeeded} description={`Support ${funding.title}`} />
                     </div>
-                    <button
-                      type="submit"
-                      className="w-full py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors"
-                    >
-                      Confirm Donation
-                    </button>
                     <button
                       type="button"
                       onClick={() => setShowDonationForm(false)}
