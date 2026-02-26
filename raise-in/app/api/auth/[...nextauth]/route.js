@@ -46,6 +46,23 @@ const authOptions = {
           
         }
 
+        // Ensure the OAuth account is linked to the existing user to avoid
+        // OAuthAccountNotLinked errors when signing in with a different provider
+        try {
+          const accountsCol = mongoose.connection.db.collection('accounts');
+          const existingAccount = await accountsCol.findOne({ provider: account.provider, providerAccountId: account.providerAccountId });
+          if (!existingAccount && currentUser) {
+            await accountsCol.insertOne({
+              userId: currentUser._id,
+              type: 'oauth',
+              provider: account.provider,
+              providerAccountId: account.providerAccountId,
+              createdAt: new Date()
+            });
+          }
+        } catch (linkErr) {
+          console.warn('Could not auto-link account:', linkErr);
+        }
         return true;
       } catch (err) {
         console.error('next-auth signIn error:', err);
