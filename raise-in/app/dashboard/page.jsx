@@ -6,29 +6,43 @@ export default function Page() {
   const { data: session, status } = useSession(); 
   const [myFundings, setMyFundings] = useState([]);
 
-  // Delete a funding owned by the current user
-  const handleDelete = (id) => {
+  // Delete a funding owned by the current user via API
+  const handleDelete = async (fundingId) => {
     try {
-      const allFundings = JSON.parse(localStorage.getItem("fundings") || "[]");
-      const updatedFundings = allFundings.filter((f) => f.id !== id);
-      localStorage.setItem("fundings", JSON.stringify(updatedFundings));
-      const updatedMyFundings = updatedFundings.filter(
-        (f) => f.creator?.email === session?.user?.email
-      );
-      setMyFundings(updatedMyFundings);
+      const response = await fetch('/api/fundingDB/user', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fundingId }),
+      });
+
+      if (response.ok) {
+        // Remove from local state
+        setMyFundings((prev) => prev.filter((f) => f._id !== fundingId));
+        alert('Funding deleted successfully');
+      } else {
+        alert('Failed to delete funding');
+      }
     } catch (err) {
-      console.error("Failed to delete funding", err);
+      console.error('Error deleting funding:', err);
+      alert('Error deleting funding');
     }
   };
-  // const creatorID = session?.user?.email;
 
+  // Fetch user's fundings from database
   useEffect(() => {
-    if (session?.user?.email) {
-      const allFundings = JSON.parse(localStorage.getItem("fundings") || "[]");
-      const userFundings = allFundings.filter(
-        (f) => f.creator?.email === session.user.email
-      );
-      setMyFundings(userFundings);
+    if (session?.user?.id) {
+      const fetchUserFundings = async () => {
+        try {
+          const response = await fetch('/api/fundingDB/user');
+          if (response.ok) {
+            const data = await response.json();
+            setMyFundings(data);
+          }
+        } catch (err) {
+          console.error('Error fetching user fundings:', err);
+        }
+      };
+      fetchUserFundings();
     }
   }, [session]);
 
@@ -113,7 +127,7 @@ export default function Page() {
                   {myFundings.map((funding) => {
                     const progress = getProgressPercentage(funding.currentAmount, funding.goalAmount);
                     return (
-                      <Link key={funding.id} href={`/funding/${funding.slug}`}>
+                      <Link key={funding._id} href={`/funding/${funding.slug}`}>
                         <div className="group cursor-pointer h-full">
                           <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl overflow-hidden border border-gray-700 hover:border-blue-500 transition-all duration-300 shadow-lg hover:shadow-blue-500/20 h-full flex flex-col">
                             {/* Image */}
@@ -131,22 +145,20 @@ export default function Page() {
                                   </svg>
                                 </div>
                               )}
-                              {/* Delete button (owner only) */}
-                              {session?.user?.email === funding.creator?.email && (
-                                <button
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    handleDelete(funding.id);
-                                  }}
-                                  className="absolute top-3 left-3 p-1 bg-red-600 hover:bg-red-700 rounded-full text-white z-20"
-                                  aria-label="Delete campaign"
-                                >
-                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                  </svg>
-                                </button>
-                              )}
+                              {/* Delete button (always show - these are only user's own fundings) */}
+                              <button
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  handleDelete(funding._id);
+                                }}
+                                className="absolute top-3 left-3 p-1 bg-red-600 hover:bg-red-700 rounded-full text-white z-20"
+                                aria-label="Delete campaign"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                              </button>
 
                               <div className="absolute top-3 right-3">
                                 <span className="px-3 py-1 bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-xs font-semibold rounded-full">

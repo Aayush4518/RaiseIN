@@ -1,0 +1,91 @@
+import GoogleProvider from 'next-auth/providers/google';
+import EmailProvider from 'next-auth/providers/email';
+import GitHubProvider from 'next-auth/providers/github';
+import { MongoDBAdapter } from '@auth/mongodb-adapter';
+import clientPromise from '@/lib/mongodb';
+import mongoose from 'mongoose';
+import User from '@/models/user';
+
+export const authOptions = {
+  adapter: MongoDBAdapter(clientPromise),
+  providers: [
+    GitHubProvider({
+      clientId: process.env.GITHUB_ID,
+      clientSecret: process.env.GITHUB_SECRET,
+    }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_ID,
+      clientSecret: process.env.GOOGLE_SECRET,
+    }),
+    EmailProvider({
+      server: process.env.EMAIL_SERVER,
+      from: process.env.EMAIL_FROM,
+    }),
+  ],
+  callbacks: {
+    async signIn({ user, account, profile }) {
+      try {
+        await mongoose.connect(process.env.MONGODB_URI);
+
+        let currentUser = await User.findOne({ email: user.email });
+        if (!currentUser) {
+          const username = (user.email || '').split('@')[0];
+          currentUser = await User.create({
+            name: user.name || username,
+            Username: username,
+            email: user.email,
+            profilePicture: profile?.avatar_url || user.image || null,
+          });
+        }
+
+        // Ensure the OAuth account is linked to the existing user to avoid
+        // OAuthAccountNotLinked errors when signing in with a different provider
+        try {
+          const accountsCol = mongoose.connection.db.collection('accounts');
+          const existingAccount = await accountsCol.findOne({
+            provider: account.provider,
+            providerAccountId: account.providerAccountId,
+          });
+          if (!existingAccount && currentUser) {
+            await accountsCol.insertOne({
+              userId: currentUser._id,
+              type: 'oauth',
+              provider: account.provider,
+              providerAccountId: account.providerAccountId,
+              createdAt: new Date(),
+            });
+          }
+        } catch (linkErr) {
+          console.warn('Could not auto-link account:', linkErr);
+        }
+        return true;
+      } catch (err) {
+        console.error('next-auth signIn error:', err);
+        return false;
+      }
+    },
+    async session({ session, user }) {
+      try {
+        await mongoose.connect(process.env.MONGODB_URI);
+        const currentUser = await User.findOne({ email: session.user.email });
+        if (currentUser) {
+          session.user.id = currentUser._id.toString();
+          session.user.name = currentUser.name;
+          session.user.email = currentUser.email;
+          session.user.profilePicture = currentUser.profilePicture;
+        }
+        return session;
+      } catch (err) {
+        console.error('next-auth session callback error:', err);
+        return session;
+      }
+    },
+  },
+  session: {
+    strategy: 'database',
+    secret: process.env.NEXTAUTH_SECRET,
+  },
+  pages: {
+    signIn: '/login',
+  },
+};

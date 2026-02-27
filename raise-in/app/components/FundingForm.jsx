@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useSession } from "next-auth/react";
+// The FundingForm component is a client-side component and should not import server-side
+// database modules such as fundingDB. Data is sent through an API route instead.
 
 export default function FundingForm({ onFundingAdded }) {
   const { data: session } = useSession();
@@ -11,7 +13,7 @@ export default function FundingForm({ onFundingAdded }) {
     description: "",
     purpose: "",
     goalAmount: "",
-    currentAmount: "",
+    currentAmount: "0",
     category: "education",
     image: "",
   });
@@ -68,8 +70,29 @@ export default function FundingForm({ onFundingAdded }) {
     const existingFundings = JSON.parse(localStorage.getItem("fundings") || "[]");
     const updatedFundings = [newFunding, ...existingFundings];
 
-    // Save to localStorage
-    localStorage.setItem("fundings", JSON.stringify(updatedFundings));
+    // Save to database
+    fetch("/api/fundingDB", {
+      method: "POST", 
+      headers:{ "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: formData.title,
+        slug: slug,
+        description: formData.description,
+        purpose: formData.purpose,
+        goalAmount: parseFloat(formData.goalAmount),
+        currentAmount: parseFloat(formData.currentAmount) || 0,
+        category: formData.category,
+        image: formData.image,
+      })
+    })
+    .then((res) => res.json()) 
+    .then((data) => {
+      console.log("Funding saved to DB:", data);
+      alert("Funding created successfully!");
+    })
+    .catch((err) => {
+      console.error("Error saving funding to DB:", err);
+    });
 
     // Reset form
     setFormData({
@@ -77,7 +100,7 @@ export default function FundingForm({ onFundingAdded }) {
       description: "",
       purpose: "",
       goalAmount: "",
-      currentAmount: "",
+      currentAmount: "0",
       category: "education",
       image: "",
     });

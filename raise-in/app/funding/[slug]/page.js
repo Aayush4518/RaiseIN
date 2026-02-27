@@ -19,17 +19,28 @@ export default function FundingDetail() {
   useEffect(() => {
     if (!slug) return;
 
-    const loadFunding = () => {
-      const allFundings = JSON.parse(localStorage.getItem("fundings") || "[]");
-      const found = allFundings.find((f) => f.slug === slug);
-      setFunding(found);
-      setLoading(false);
+    const loadFunding = async () => {
+      try {
+        const response = await fetch(`/api/fundingDB/${slug}`);
+        if (response.ok) {
+          const data = await response.json();
+          setFunding(data);
+        } else {
+          console.error('Failed to fetch funding:', response.statusText);
+          setFunding(null);
+        }
+      } catch (err) {
+        console.error('Error fetching funding:', err);
+        setFunding(null);
+      } finally {
+        setLoading(false);
+      }
     };
 
     loadFunding();
   }, [slug]);
 
-  const handleDonate = (e) => {
+  const handleDonate = async (e) => {
     e.preventDefault();
     const amount = parseFloat(donationAmount);
 
@@ -38,26 +49,26 @@ export default function FundingDetail() {
       return;
     }
 
-    // Update funding with new amount
-    const allFundings = JSON.parse(localStorage.getItem("fundings") || "[]");
-    const updatedFundings = allFundings.map((f) => {
-      if (f.slug === slug) {
-        return {
-          ...f,
-          currentAmount: f.currentAmount + amount,
-        };
+    try {
+      const response = await fetch(`/api/fundingDB/${slug}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ donationAmount: amount }),
+      });
+
+      if (response.ok) {
+        const updatedFunding = await response.json();
+        setFunding(updatedFunding);
+        setDonationAmount("");
+        setShowDonationForm(false);
+        alert(`Thank you for donating ₹${amount}!`);
+      } else {
+        alert('Failed to process donation');
       }
-      return f;
-    });
-
-    localStorage.setItem("fundings", JSON.stringify(updatedFundings));
-    const updatedFunding = updatedFundings.find((f) => f.slug === slug);
-    setFunding(updatedFunding);
-    setDonationAmount("");
-    setShowDonationForm(false);
-
-    // Show success message
-    alert(`Thank you for donating ₹${amount}!`);
+    } catch (err) {
+      console.error('Error processing donation:', err);
+      alert('Error processing donation');
+    }
   };
 
   const getProgressPercentage = () => {
@@ -117,10 +128,10 @@ export default function FundingDetail() {
 
       <div className="relative z-10">
         {/* Navigation */}
-        <div className="px-4 md:px-8 py-6 border-b border-gray-700">
+        <div className="px-4 md:px-8 py-4 md:py-6 border-b border-gray-700">
           <div className="max-w-6xl mx-auto">
-            <Link href="/home" className="inline-flex items-center text-blue-400 hover:text-cyan-400 transition-colors">
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <Link href="/home" className="inline-flex items-center text-blue-400 hover:text-cyan-400 transition-colors text-sm md:text-base">
+              <svg className="w-4 h-4 md:w-5 md:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
               Back to Campaigns
@@ -129,17 +140,17 @@ export default function FundingDetail() {
         </div>
 
         {/* Hero Section */}
-        <section className="px-4 md:px-8 py-12">
-          <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <section className="px-4 md:px-8 py-8 md:py-12">
+          <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
             {/* Main Content */}
             <div className="lg:col-span-2">
               {/* Featured Image */}
-              <div className="relative h-96 rounded-xl overflow-hidden mb-8 shadow-2xl">
+              <div className="relative h-48 sm:h-64 md:h-80 lg:h-96 rounded-xl overflow-hidden mb-6 md:mb-8 shadow-2xl">
                 {funding.image ? (
                   <img src={funding.image} alt={funding.title} className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center">
-                    <svg className="w-24 h-24 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-12 h-12 sm:w-16 sm:h-16 md:w-24 md:h-24 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                   </div>
@@ -147,74 +158,74 @@ export default function FundingDetail() {
               </div>
 
               {/* Title and Category */}
-              <div className="mb-8">
-                <div className="flex items-center gap-3 mb-4">
-                  <span className="px-4 py-1 bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-sm font-semibold rounded-full">
+              <div className="mb-6 md:mb-8">
+                <div className="flex flex-wrap items-center gap-2 md:gap-3 mb-3 md:mb-4">
+                  <span className="px-3 md:px-4 py-1 bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-xs md:text-sm font-semibold rounded-full">
                     {funding.category}
                   </span>
-                  <span className="px-4 py-1 bg-gray-800 text-gray-300 text-sm rounded-full">
+                  <span className="px-3 md:px-4 py-1 bg-gray-800 text-gray-300 text-xs md:text-sm rounded-full">
                     Started {new Date(funding.createdAt).toLocaleDateString()}
                   </span>
                 </div>
-                <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">{funding.title}</h1>
+                <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 md:mb-4">{funding.title}</h1>
               </div>
 
               {/* Story Section */}
-              <div className="space-y-8">
-                <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-8 border border-gray-700">
-                  <h2 className="text-2xl font-bold text-white mb-4">Campaign Story</h2>
-                  <p className="text-gray-300 leading-relaxed mb-6">{funding.description}</p>
+              <div className="space-y-6 md:space-y-8">
+                <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-4 md:p-8 border border-gray-700">
+                  <h2 className="text-xl md:text-2xl font-bold text-white mb-3 md:mb-4">Campaign Story</h2>
+                  <p className="text-sm md:text-base text-gray-300 leading-relaxed mb-4 md:mb-6">{funding.description}</p>
                 </div>
 
-                <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-8 border border-gray-700">
-                  <h2 className="text-2xl font-bold text-white mb-4">How Funds Will Be Used</h2>
-                  <p className="text-gray-300 leading-relaxed">{funding.purpose}</p>
+                <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-4 md:p-8 border border-gray-700">
+                  <h2 className="text-xl md:text-2xl font-bold text-white mb-3 md:mb-4">How Funds Will Be Used</h2>
+                  <p className="text-sm md:text-base text-gray-300 leading-relaxed">{funding.purpose}</p>
                 </div>
               </div>
             </div>
 
             {/* Sidebar - Donation Card */}
             <div className="lg:col-span-1">
-              <div className="sticky top-8 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-8 border border-gray-700 shadow-2xl">
+              <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-4 md:p-6 lg:p-8 border border-gray-700 shadow-2xl lg:sticky lg:top-8">
                 {/* Current Amount */}
-                <div className="mb-6">
-                  <p className="text-gray-400 text-sm mb-2">Amount Raised</p>
-                  <p className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+                <div className="mb-4 md:mb-6">
+                  <p className="text-gray-400 text-xs md:text-sm mb-2">Amount Raised</p>
+                  <p className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
                     {formatCurrency(funding.currentAmount)}
                   </p>
                 </div>
 
                 {/* Goal */}
-                <div className="mb-6 p-4 bg-gray-900/50 rounded-lg border border-gray-600">
-                  <p className="text-gray-400 text-sm mb-1">Goal Amount</p>
-                  <p className="text-xl font-semibold text-gray-300">
+                <div className="mb-4 md:mb-6 p-3 md:p-4 bg-gray-900/50 rounded-lg border border-gray-600">
+                  <p className="text-gray-400 text-xs md:text-sm mb-1">Goal Amount</p>
+                  <p className="text-lg md:text-xl font-semibold text-gray-300">
                     {formatCurrency(funding.goalAmount)}
                   </p>
                 </div>
 
                 {/* Progress Bar */}
-                <div className="mb-6">
-                  <div className="relative h-3 bg-gray-700 rounded-full overflow-hidden mb-2">
+                <div className="mb-4 md:mb-6">
+                  <div className="relative h-2 md:h-3 bg-gray-700 rounded-full overflow-hidden mb-2">
                     <div
                       className="absolute inset-y-0 left-0 bg-gradient-to-r from-blue-500 to-cyan-500 transition-all duration-300"
                       style={{ width: `${progress}%` }}
                     />
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm font-semibold text-blue-400">{Math.round(progress)}% funded</span>
-                    <span className="text-sm text-gray-500">{formatCurrency(amountNeeded)} to go</span>
+                  <div className="flex justify-between items-center flex-wrap gap-2">
+                    <span className="text-xs md:text-sm font-semibold text-blue-400">{Math.round(progress)}% funded</span>
+                    <span className="text-xs md:text-sm text-gray-500">{formatCurrency(amountNeeded)} to go</span>
                   </div>
                 </div>
 
                 {/* Stats */}
-                <div className="space-y-3 mb-6 pb-6 border-b border-gray-700">
+                <div className="space-y-2 md:space-y-3 mb-4 md:mb-6 pb-4 md:pb-6 border-b border-gray-700">
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-400 text-sm">Days Left</span>
-                    <span className="font-semibold text-orange-400">{daysLeft} days</span>
+                    <span className="text-gray-400 text-xs md:text-sm">Days Left</span>
+                    <span className="font-semibold text-orange-400 text-sm md:text-base">{daysLeft} days</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-400 text-sm">Supporters</span>
-                    <span className="font-semibold text-green-400">N/A</span>
+                    <span className="text-gray-400 text-xs md:text-sm">Supporters</span>
+                    <span className="font-semibold text-green-400 text-sm md:text-base">N/A</span>
                   </div>
                 </div>
 
@@ -223,36 +234,36 @@ export default function FundingDetail() {
                   <>
                     <button
                       onClick={() => setShowDonationForm(true)}
-                      className="w-full py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold rounded-lg hover:shadow-lg hover:shadow-blue-500/50 transition-all"
+                      className="w-full py-2 md:py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold text-sm md:text-base rounded-lg hover:shadow-lg hover:shadow-blue-500/50 transition-all"
                     >
                       Choose Donation Amount
                     </button>
-                    <div className="mt-4 text-center">
-                      <p className="text-sm text-gray-400 mb-2">Pay remaining {formatCurrency(amountNeeded)}</p>
+                    <div className="mt-3 md:mt-4 text-center">
+                      <p className="text-xs md:text-sm text-gray-400 mb-2">Pay remaining {formatCurrency(amountNeeded)}</p>
                       <PayButton amount={amountNeeded} description={`Support ${funding.title}`} />
                     </div>
                   </>
 
                 ) : (
-                  <form onSubmit={handleDonate} className="space-y-4">
-                      <label className="block text-sm font-medium text-gray-300 mb-2">Amount (₹)</label>
+                  <form onSubmit={handleDonate} className="space-y-3 md:space-y-4">
+                      <label className="block text-xs md:text-sm font-medium text-gray-300 mb-2">Amount (₹)</label>
                       <input
                         type="number"
                         value={donationAmount}
                         onChange={(e) => setDonationAmount(e.target.value)}
                         placeholder="Enter amount"
-                        className="w-full px-4 py-2 bg-gray-900 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                        className="w-full px-3 md:px-4 py-2 bg-gray-900 border border-gray-600 rounded-lg text-white placeholder-gray-500 text-sm md:text-base focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                           required
                           autoFocus
                         />
-                    <div className="flex flex-col gap-3">
-                      <div className="text-sm text-gray-300">Donate: <span className="font-semibold text-white">{donationAmount ? `₹${donationAmount}` : formatCurrency(amountNeeded)}</span></div>
+                    <div className="flex flex-col gap-2 md:gap-3">
+                      <div className="text-xs md:text-sm text-gray-300">Donate: <span className="font-semibold text-white">{donationAmount ? `₹${donationAmount}` : formatCurrency(amountNeeded)}</span></div>
                       <PayButton amount={donationAmount ? Number(donationAmount) : amountNeeded} description={`Support ${funding.title}`} />
                     </div>
                     <button
                       type="button"
                       onClick={() => setShowDonationForm(false)}
-                      className="w-full py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 font-semibold rounded-lg transition-colors"
+                      className="w-full py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 font-semibold text-sm md:text-base rounded-lg transition-colors"
                     >
                       Cancel
                     </button>
@@ -266,21 +277,21 @@ export default function FundingDetail() {
                   </button> */}
 
                 {/* Share Buttons */}
-                <div className="mt-6 pt-6 border-t border-gray-700">
-                  <p className="text-gray-400 text-sm mb-4">Share this campaign</p>
-                  <div className="grid grid-cols-3 gap-3">
-                    <button className="p-3 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors flex items-center justify-center">
-                      <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <div className="mt-4 md:mt-6 pt-4 md:pt-6 border-t border-gray-700">
+                  <p className="text-gray-400 text-xs md:text-sm mb-3 md:mb-4">Share this campaign</p>
+                  <div className="grid grid-cols-3 gap-2 md:gap-3">
+                    <button className="p-2 md:p-3 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors flex items-center justify-center">
+                      <svg className="w-4 h-4 md:w-5 md:h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                       </svg>
                     </button>
-                    <button className="p-3 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors flex items-center justify-center">
-                      <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <button className="p-2 md:p-3 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors flex items-center justify-center">
+                      <svg className="w-4 h-4 md:w-5 md:h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
                       </svg>
                     </button>
-                    <button className="p-3 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors flex items-center justify-center">
-                      <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <button className="p-2 md:p-3 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors flex items-center justify-center">
+                      <svg className="w-4 h-4 md:w-5 md:h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M6.94 5a2 2 0 1 1-4-.002 2 2 0 0 1 4 .002zM7 8.48H3V21h4V8.48zm6.32 0H9.34V21h3.94v-6.57c0-3.66 4.77-4 4.77 0V21H22v-7.93c0-6.17-7.06-5.94-8.72-2.91l.04-1.68z" />
                       </svg>
                     </button>
