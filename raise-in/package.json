@@ -11,6 +11,8 @@
   "dependencies": {
     "@auth/mongodb-adapter": "^3.11.1",
     "@react-three/fiber": "^9.5.0",
+    "@upstash/ratelimit": "^2.0.8",
+    "@upstash/redis": "^1.36.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "express": "^5.2.1",

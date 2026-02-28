@@ -2,6 +2,34 @@ import mongoose from 'mongoose';
 import FundingFormDB from '@/models/fundingDB';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
+import { fundingRateLimit } from '@/lib/ratelimit';
+
+// API route for managing a user's own fundings.  Requires authentication and ownership of the funding document.  Supports GET for listing a user's fundings
+// and DELETE for removing a funding.  Connects to the same MongoDB used by the
+// auth route and uses the authenticated user's ID to ensure they can only access
+// their own fundings.
+
+export async function GET(request){
+  try{
+    const session= await getServerSession(authOptions)
+    if(!session?.user?.id){
+      return new Response(JSON.stringify({error: 'Unauthorized'}), {status: 401})
+    }
+    const ip= request.headers.get('x-forwarded-for') || request.socket?.remoteAddress || 'anonymous';
+    const key= `${session.user.email}-${ip}`;
+    const {success}= await fundingRateLimit.limit(key)
+    if(!success){
+      return new Response(JSON.stringify({error: 'Too many requests'}), {status: 429})
+    }
+    await mongoose.connect(process.env.MONGODB_URI)
+    const userFundings= await FundingFormDB.find({userId: session.user.id}).sort({createdAt: -1})
+    return new Response(JSON.stringify(userFundings), {status: 200})
+  }
+  catch(err){
+    console.error('Error in /api/fundingDB/user GET: ', err)
+    return new Response(JSON.stringify({ error: err.message }), { status: 500 })
+  }
+}
 
 // API route for creating and listing funding documents.  Connects to the
 // same MongoDB used by the auth route and adds the authenticated user's ID.
@@ -19,6 +47,12 @@ export async function POST(request) {
     if (!userId) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
     }
+      const ip= request.headers.get('x-forwarded-for') || request.socket?.remoteAddress || 'anonymous';
+      const key= `${session.user.email}-${ip}`;
+      const { success } = await fundingRateLimit.limit(key);
+      if (!success) {
+        return new Response(JSON.stringify({ error: 'Too many requests' }), { status: 429 });
+      }
 
     await mongoose.connect(process.env.MONGODB_URI);
 
@@ -52,15 +86,15 @@ export async function POST(request) {
 //   }
 // }
 
-export async function GET(request){
-    try{
-        await mongoose.connect(process.env.MONGODB_URI)
-        const fundings= await FundingFormDB.find().sort({createdAt: -1})
-        return new Response(JSON.stringify(fundings), {status: 200})
+// export async function GET(request){
+//     try{
+//         await mongoose.connect(process.env.MONGODB_URI)
+//         const fundings= await FundingFormDB.find().sort({createdAt: -1})
+//         return new Response(JSON.stringify(fundings), {status: 200})
 
-    }
-    catch(err){
-        console.error('Error in /api/fundingDB GET: ', err)
-        return new Response(JSON.stringify({ error: err.message }), { status: 500 })
-    }
-}
+//     }
+//     catch(err){
+//         console.error('Error in /api/fundingDB GET: ', err)
+//         return new Response(JSON.stringify({ error: err.message }), { status: 500 })
+//     }
+// }

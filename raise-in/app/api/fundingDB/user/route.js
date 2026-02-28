@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import FundingFormDB from '@/models/fundingDB';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
+import { fundingRateLimit } from '@/lib/ratelimit';
 
 // GET user's own fundings (requires authentication)
 export async function GET(request) {
@@ -11,7 +12,12 @@ export async function GET(request) {
     if (!session?.user?.id) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
     }
-
+    const ip= request.headers.get('x-forwarded-for') || request.socket?.remoteAddress || 'anonymous';
+    const key= `${session.user.email}-${ip}`;
+    const { success } = await fundingRateLimit.limit(key);
+    if (!success) {
+      return new Response(JSON.stringify({ error: 'Too many requests' }), { status: 429 });
+    }
     await mongoose.connect(process.env.MONGODB_URI);
 
     const userFundings = await FundingFormDB.find({ userId: session.user.id }).sort({
@@ -32,6 +38,12 @@ export async function DELETE(request) {
 
     if (!session?.user?.id) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+    }
+    const ip= request.headers.get('x-forwarded-for') || request.socket?.remoteAddress || 'anonymous';
+    const key= `${session.user.email}-${ip}`;
+    const { success } = await fundingRateLimit.limit(key);
+    if (!success) {
+      return new Response(JSON.stringify({ error: 'Too many requests' }), { status: 429 });
     }
 
     const { fundingId } = await request.json();
