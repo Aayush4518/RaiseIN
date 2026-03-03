@@ -1,11 +1,11 @@
 "use client";
-import React from 'react'
+import React, { Suspense } from 'react';
 import { SignInPage } from "@/app/components/login-ui";
 
-const page = () => {
+export default function Page() {
   return (
-    <SignInPage />
-  )
+    <Suspense fallback={null}>
+      <SignInPage />
+    </Suspense>
+  );
 }
-
-export default page
