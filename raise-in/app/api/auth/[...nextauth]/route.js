@@ -1,31 +1,33 @@
-import NextAuth from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { authRateLimit } from '@/lib/ratelimit';
+// app/api/auth/[...nextauth]/route.js
+import { authOptions } from "@/lib/auth";
+import { authRateLimit } from "@/lib/ratelimit";
+import { NextResponse } from "next/server";
 
-// create reusable NextAuth handler once with options
-const nextAuthHandler = NextAuth(authOptions);
-
-// common processing logic for both GET and POST
-async function handle(req, context) {
+async function handle(req) {
   const ip =
-    req.headers.get('x-forwarded-for') || req.socket?.remoteAddress ||
-    'anonymous';
+    req.headers.get("x-forwarded-for") || req.socket?.remoteAddress || "anonymous";
 
+  // Rate limit check
   const { success } = await authRateLimit.limit(ip);
   if (!success) {
-    return new Response(JSON.stringify({ error: 'Too many requests' }), {
+    return new NextResponse(JSON.stringify({ error: "Too many requests" }), {
       status: 429,
+      headers: { "Content-Type": "application/json" },
     });
   }
 
-  // forward the request and context so NextAuth treats it as an App Router call
-  return nextAuthHandler(req, context);
+  // Dynamically import NextAuth for App Router
+  const { default: NextAuth } = await import("next-auth/next");
+
+  // Call NextAuth with the request and options
+  return NextAuth({ req, options: authOptions });
 }
 
-export async function GET(req, context) {
-  return handle(req, context);
+// Export for GET and POST
+export async function GET(req) {
+  return handle(req);
 }
 
-export async function POST(req, context) {
-  return handle(req, context);
+export async function POST(req) {
+  return handle(req);
 }
