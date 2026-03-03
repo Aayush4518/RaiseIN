@@ -18,6 +18,7 @@ if (!process.env.NEXTAUTH_URL) {
 }
 
 export const authOptions = {
+  debug: true,
   adapter: MongoDBAdapter(clientPromise),
   providers: [
     GitHubProvider({
@@ -97,6 +98,14 @@ export const authOptions = {
         console.error('next-auth session callback error:', err);
         return session;
       }
+    },
+  },
+  events: {
+    async signIn({ user, account, isNewUser }) {
+      console.log('NextAuth signIn event', account.provider, user.email, 'new?', isNewUser);
+    },
+    async error(message) {
+      console.error('NextAuth event error', message);
     },
   },
   session: {

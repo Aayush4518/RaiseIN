@@ -500,12 +500,15 @@ export const SignInPage = ({
   // show provider error messages from query string
   const searchParams = useSearchParams();
   const errorParam = searchParams.get("error");
+  const descParam = searchParams.get("error_description") || searchParams.get("error_description");
   useEffect(() => {
     if (errorParam) {
-      console.warn("NextAuth error param:", errorParam);
-      setAuthMessage(`Authentication error: ${errorParam}`);
+      console.warn("NextAuth error param:", errorParam, descParam);
+      let msg = `Authentication error: ${errorParam}`;
+      if (descParam) msg += ` (${decodeURIComponent(descParam)})`;
+      setAuthMessage(msg);
     }
-  }, [errorParam]);
+  }, [errorParam, descParam]);
 
   const handleEmailSubmit = (e) => {
     e.preventDefault();

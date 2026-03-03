@@ -10,9 +10,9 @@ async function handle(req, context) {
   // debugging help: log method + url/query so we can inspect callback flows
   try {
     const url = req.nextUrl ? req.nextUrl.href : req.url;
-    console.log('Auth route:', req.method, url, 'params', context?.params);
+    const query = req.nextUrl ? req.nextUrl.searchParams.toString() : new URL(req.url).search;
+    console.log('Auth route:', req.method, url, 'query', query, 'params', context?.params);
   } catch {}
-
   const ip =
     req.headers.get('x-forwarded-for') || req.socket?.remoteAddress ||
     'anonymous';
