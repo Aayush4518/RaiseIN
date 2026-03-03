@@ -17,11 +17,13 @@ async function handle(req, context) {
     req.headers.get('x-forwarded-for') || req.socket?.remoteAddress ||
     'anonymous';
 
-  // don't throttle the actual OAuth callback itself; failing it leads to
-  // `error=Callback` on the client.  We'll only apply the window for other
-  // actions (sign-in page, sign-out, etc).
+  // don't throttle the actual OAuth callback itself or the internal
+  // logging endpoint NextAuth uses.  Failing either one will surface an
+  // `error=Callback` back to the browser or spam the console with 429s.
+  // We'll only apply the window for other actions (sign-in page, sign-out,
+  // etc).
   const path = req.nextUrl ? req.nextUrl.pathname : new URL(req.url).pathname;
-  if (!path.includes('/callback')) {
+  if (!path.includes('/callback') && !path.includes('/_log')) {
     const { success } = await authRateLimit.limit(ip);
     if (!success) {
       console.warn('auth rate limit exceeded for', ip);
