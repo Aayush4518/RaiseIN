@@ -6,6 +6,17 @@ import clientPromise from '@/lib/mongodb';
 import mongoose from 'mongoose';
 import User from '@/models/user';
 
+// log environment values to catch misconfigurations at startup
+if (!process.env.GITHUB_ID || !process.env.GITHUB_SECRET) {
+  console.warn('GitHub OAuth credentials missing');
+}
+if (!process.env.GOOGLE_ID || !process.env.GOOGLE_SECRET) {
+  console.warn('Google OAuth credentials missing');
+}
+if (!process.env.NEXTAUTH_URL) {
+  console.warn('NEXTAUTH_URL not set');
+}
+
 export const authOptions = {
   adapter: MongoDBAdapter(clientPromise),
   providers: [
@@ -67,6 +78,7 @@ export const authOptions = {
         // users can still authenticate (their user record may be created
         // later when the DB is reachable).
         console.error('next-auth signIn error (non-fatal):', err);
+        console.log("error is ", err)
         return true;
       }
     },

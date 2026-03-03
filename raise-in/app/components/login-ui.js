@@ -1,5 +1,6 @@
 "use client";;
 import React, { useState,useMemo, useRef, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -495,6 +496,16 @@ export const SignInPage = ({
   const [initialCanvasVisible, setInitialCanvasVisible] = useState(true);
   const [reverseCanvasVisible, setReverseCanvasVisible] = useState(false);
   const [authMessage, setAuthMessage] = useState("");
+
+  // show provider error messages from query string
+  const searchParams = useSearchParams();
+  const errorParam = searchParams.get("error");
+  useEffect(() => {
+    if (errorParam) {
+      console.warn("NextAuth error param:", errorParam);
+      setAuthMessage(`Authentication error: ${errorParam}`);
+    }
+  }, [errorParam]);
 
   const handleEmailSubmit = (e) => {
     e.preventDefault();
