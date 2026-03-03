@@ -1,5 +1,5 @@
-import mongoose from 'mongoose';
 import FundingFormDB from '@/models/fundingDB';
+import { mongoosePromise } from '@/lib/mongodb';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { fundingRateLimit } from '@/lib/ratelimit';
@@ -11,7 +11,7 @@ import { fundingRateLimit } from '@/lib/ratelimit';
 
 export async function GET(request){
   try{
-    await mongoose.connect(process.env.MONGODB_URI)
+    await mongoosePromise;
     const allFundings= await FundingFormDB.find().sort({createdAt: -1})
     return new Response(JSON.stringify(allFundings), {status: 200})
   }
@@ -44,7 +44,7 @@ export async function POST(request) {
         return new Response(JSON.stringify({ error: 'Too many requests' }), { status: 429 });
       }
 
-    await mongoose.connect(process.env.MONGODB_URI);
+    await mongoosePromise;
 
     const created = await FundingFormDB.create({
       title: body.title,

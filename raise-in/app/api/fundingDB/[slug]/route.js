@@ -1,5 +1,5 @@
-import mongoose from 'mongoose';
 import FundingFormDB from '@/models/fundingDB';
+import { mongoosePromise } from '@/lib/mongodb';
 
 // GET a single funding by slug
 export async function GET(request, { params }) {
@@ -10,7 +10,7 @@ export async function GET(request, { params }) {
       return new Response(JSON.stringify({ error: 'Slug is required' }), { status: 400 });
     }
 
-    await mongoose.connect(process.env.MONGODB_URI);
+    await mongoosePromise;
 
     const funding = await FundingFormDB.findOne({ slug }).populate('userId', 'name email');
 
@@ -35,7 +35,7 @@ export async function PATCH(request, { params }) {
       return new Response(JSON.stringify({ error: 'Invalid slug or donation amount' }), { status: 400 });
     }
 
-    await mongoose.connect(process.env.MONGODB_URI);
+    await mongoosePromise;
 
     const funding = await FundingFormDB.findOneAndUpdate(
       { slug },

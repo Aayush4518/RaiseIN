@@ -2,8 +2,7 @@ import GoogleProvider from 'next-auth/providers/google';
 import EmailProvider from 'next-auth/providers/email';
 import GitHubProvider from 'next-auth/providers/github';
 import { MongoDBAdapter } from '@auth/mongodb-adapter';
-import clientPromise from '@/lib/mongodb';
-import mongoose from 'mongoose';
+import clientPromise, { mongoosePromise } from '@/lib/mongodb';
 import User from '@/models/user';
 
 // log environment values to catch misconfigurations at startup
@@ -46,14 +45,6 @@ function createSafeAdapter(inner) {
 
 export const authOptions = {
   debug: true,
-  // allowNextAuth to automatically link accounts with the same email
-  // address.  This is considered "dangerous" because it bypasses the
-  // normal email verification step; however our signIn callback already
-  // ensures the user record exists and handles linking explicitly if
-  // needed, so it's safe for this application.  the adapter also needs
-  // to be informed so it won't create multiple user records internally.
-  allowDangerousEmailAccountLinking: true,
-
   // NextAuth's built-in logger gives us more granular output in production
   logger: {
     error(code, ...metadata) {
@@ -88,7 +79,9 @@ export const authOptions = {
   callbacks: {
     async signIn({ user, account, profile }) {
       try {
-        await mongoose.connect(process.env.MONGODB_URI);
+        // ensure mongoose has connected via our shared promise; this way
+        // the adapter and Mongoose use the exact same underlying client
+        await mongoosePromise;
 
         let currentUser = await User.findOne({ email: user.email });
         if (!currentUser) {
@@ -100,35 +93,8 @@ export const authOptions = {
             profilePicture: profile?.avatar_url || user.image || null,
           });
         }
-
-        // Ensure the OAuth account is linked to the existing user to avoid
-        // OAuthAccountNotLinked errors when signing in with a different provider
-        try {
-          const accountsCol = mongoose.connection.db.collection('accounts');
-          const existingAccount = await accountsCol.findOne({
-            provider: account.provider,
-            providerAccountId: account.providerAccountId,
-          });
-          if (!existingAccount && currentUser) {
-            await accountsCol.insertOne({
-              userId: currentUser._id,
-              type: 'oauth',
-              provider: account.provider,
-              providerAccountId: account.providerAccountId,
-              createdAt: new Date(),
-            });
-          }
-        } catch (linkErr) {
-          console.warn('Could not auto-link account:', linkErr);
-        }
         return true;
       } catch (err) {
-        // If DB operations fail, log the error but allow the sign-in to
-        // continue. Returning `false` causes NextAuth to redirect with
-        // `error=Callback` which blocks OAuth flows when the database or
-        // network is temporarily unavailable. Allowing the sign-in ensures
-        // users can still authenticate (their user record may be created
-        // later when the DB is reachable).
         console.error('next-auth signIn error (non-fatal):', err);
         console.log("error is ", err)
         return true;
@@ -136,7 +102,7 @@ export const authOptions = {
     },
     async session({ session, user }) {
       try {
-        await mongoose.connect(process.env.MONGODB_URI);
+        await mongoosePromise;
         const currentUser = await User.findOne({ email: session.user.email });
         if (currentUser) {
           session.user.id = currentUser._id.toString();

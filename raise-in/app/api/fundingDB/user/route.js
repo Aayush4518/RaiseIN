@@ -1,5 +1,5 @@
-import mongoose from 'mongoose';
 import FundingFormDB from '@/models/fundingDB';
+import { mongoosePromise } from '@/lib/mongodb';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { fundingRateLimit } from '@/lib/ratelimit';
@@ -18,7 +18,7 @@ export async function GET(request) {
     if (!success) {
       return new Response(JSON.stringify({ error: 'Too many requests' }), { status: 429 });
     }
-    await mongoose.connect(process.env.MONGODB_URI);
+    await mongoosePromise;
 
     const userFundings = await FundingFormDB.find({ userId: session.user.id }).sort({
       createdAt: -1,
@@ -54,7 +54,7 @@ export async function DELETE(request) {
       });
     }
 
-    await mongoose.connect(process.env.MONGODB_URI);
+    await mongoosePromise;
 
     // Ensure user owns this funding before deleting
     const funding = await FundingFormDB.findById(fundingId);
