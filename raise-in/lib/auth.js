@@ -46,6 +46,13 @@ function createSafeAdapter(inner) {
 
 export const authOptions = {
   debug: true,
+  // allowNextAuth to automatically link accounts with the same email
+  // address.  This is considered "dangerous" because it bypasses the
+  // normal email verification step; however our signIn callback already
+  // ensures the user record exists and handles linking explicitly if
+  // needed, so it's safe for this application.
+  allowDangerousEmailAccountLinking: true,
+
   // NextAuth's built-in logger gives us more granular output in production
   logger: {
     error(code, ...metadata) {
