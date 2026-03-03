@@ -1,6 +1,8 @@
 @import "tailwindcss";
 
-@plugin "tailwindcss-animate";
+/* animations are provided by tw-animate-css; the separate
+   tailwindcss-animate plugin was removed to avoid resolution
+   errors. */
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));

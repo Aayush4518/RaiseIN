@@ -11,22 +11,12 @@ import { fundingRateLimit } from '@/lib/ratelimit';
 
 export async function GET(request){
   try{
-    const session= await getServerSession(authOptions)
-    if(!session?.user?.id){
-      return new Response(JSON.stringify({error: 'Unauthorized'}), {status: 401})
-    }
-    const ip= request.headers.get('x-forwarded-for') || request.socket?.remoteAddress || 'anonymous';
-    const key= `${session.user.email}-${ip}`;
-    const {success}= await fundingRateLimit.limit(key)
-    if(!success){
-      return new Response(JSON.stringify({error: 'Too many requests'}), {status: 429})
-    }
     await mongoose.connect(process.env.MONGODB_URI)
-    const userFundings= await FundingFormDB.find({userId: session.user.id}).sort({createdAt: -1})
-    return new Response(JSON.stringify(userFundings), {status: 200})
+    const allFundings= await FundingFormDB.find().sort({createdAt: -1})
+    return new Response(JSON.stringify(allFundings), {status: 200})
   }
   catch(err){
-    console.error('Error in /api/fundingDB/user GET: ', err)
+    console.error('Error in /api/fundingDB GET: ', err)
     return new Response(JSON.stringify({ error: err.message }), { status: 500 })
   }
 }

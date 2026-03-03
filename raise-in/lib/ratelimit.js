@@ -10,7 +10,7 @@ export const donationRateLimit= new Ratelimit({
 })
 export const fundingRateLimit= new Ratelimit({
     redis, 
-    limiter: Ratelimit.slidingWindow(3, "1 m") // 3 requests per minute
+    limiter: Ratelimit.slidingWindow(20, "1 m") // 20 requests per minute
 })
 export const authRateLimit= new Ratelimit({
     redis, 
