@@ -60,8 +60,14 @@ export const authOptions = {
         }
         return true;
       } catch (err) {
-        console.error('next-auth signIn error:', err);
-        return false;
+        // If DB operations fail, log the error but allow the sign-in to
+        // continue. Returning `false` causes NextAuth to redirect with
+        // `error=Callback` which blocks OAuth flows when the database or
+        // network is temporarily unavailable. Allowing the sign-in ensures
+        // users can still authenticate (their user record may be created
+        // later when the DB is reachable).
+        console.error('next-auth signIn error (non-fatal):', err);
+        return true;
       }
     },
     async session({ session, user }) {
