@@ -50,7 +50,8 @@ export const authOptions = {
   // address.  This is considered "dangerous" because it bypasses the
   // normal email verification step; however our signIn callback already
   // ensures the user record exists and handles linking explicitly if
-  // needed, so it's safe for this application.
+  // needed, so it's safe for this application.  the adapter also needs
+  // to be informed so it won't create multiple user records internally.
   allowDangerousEmailAccountLinking: true,
 
   // NextAuth's built-in logger gives us more granular output in production
@@ -65,7 +66,11 @@ export const authOptions = {
       console.log('NextAuth logger debug', code, ...metadata);
     },
   },
-  adapter: createSafeAdapter(MongoDBAdapter(clientPromise)),
+  adapter: createSafeAdapter(
+    MongoDBAdapter(clientPromise, {
+      allowDangerousEmailAccountLinking: true,
+    })
+  ),
   providers: [
     GitHubProvider({
       clientId: process.env.GITHUB_ID,
