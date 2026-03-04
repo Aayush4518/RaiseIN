@@ -36,7 +36,7 @@
 
     if (session) {
       return (
-        <nav className={`w-[98%] h-16 rounded-full m-4 z-50 flex items-center justify-between px-6 text-neutral-100 fixed top-0 left-0 transition-all duration-300 ${
+        <nav className={`w-[92%] mx-[4%] h-16 rounded-full m-4 z-50 flex items-center justify-between px-6 text-neutral-100 fixed top-0 left-0 transition-all duration-300 ${
           isScrolled
             ? "bg-white/10 backdrop-blur-md border-b border-white/20 shadow-md"
             : "bg-transparent"
