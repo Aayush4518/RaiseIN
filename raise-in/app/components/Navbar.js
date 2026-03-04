@@ -9,6 +9,7 @@
     const { data: session } = useSession()
     const [open, setOpen] = useState(false)
     const [isScrolled, setIsScrolled] = useState(false)
+    const router = useRouter()
     // compute href ahead of time to avoid routing issues
     const homeHref = session ? '/home' : '/'
 
@@ -87,11 +88,12 @@
           {open && (
             <div className={`absolute top-16 left-0 w-full md:hidden transition-all duration-300 ${
               isScrolled
-                ? "bg-white/10 backdrop-blur-md border-t border-white/20"
+                ? "bg-neutral-900/95 backdrop-blur-md border-t border-white/20"
                 : "bg-neutral-900/95 backdrop-blur-md border-t border-white/10"
             }`}>
               <div className="flex flex-col items-start gap-4 px-6 py-4 text-left">
-                <span onClick={handleMobileHome} className="cursor-pointer">Home</span>
+                {/* <span onClick={handleMobileHome} className="cursor-pointer">Home</span> */}
+                <Link href="/home" onClick={() => setOpen(false)}>Home</Link>
                 <Link href="/about" onClick={() => setOpen(false)}>About</Link>
                 <Link href="/services" onClick={() => setOpen(false)}>Services</Link>
                 <Link href="/contact" onClick={() => setOpen(false)}>Contact</Link>
@@ -128,11 +130,7 @@
 
           <span
             onClick={() => {
-              if (session) {
-                router.push('/home').catch(err => console.warn('nav error', err))
-              } else {
-                window.location.assign('/')
-              }
+              window.location.assign('/')
             }}
             className="text-lg font-semibold cursor-pointer"
           >
@@ -160,10 +158,8 @@
 
         {/* MOBILE VIEW */}
         {open && (
-          <div className={`absolute top-16 left-0 w-full md:hidden transition-all duration-300 ${
-            isScrolled
-              ? "bg-white/10 backdrop-blur-md border-t border-white/20"
-              : "bg-neutral-900/95 backdrop-blur-md border-t border-white/10"
+          <div className={`absolute top-16 left-0 w-full md:hidden transition-all duration-300 bg-neutral-900/95 backdrop-blur-md border-t ${
+            isScrolled ? "border-white/20" : "border-white/10"
           }`}>
             <div className="flex flex-col items-start gap-4 px-6 py-4 text-left">
               <span onClick={handleMobileHome} className="cursor-pointer">Home</span>
