@@ -1,5 +1,5 @@
 # **RaiseIN**
-App live at: raisein.vercel.app
+App live at: https://raisein.vercel.app/
 
 A full-stack crowdfunding platform built to explore how real applications handle **authentication, payments, ownership permissions, and API security**.
 
