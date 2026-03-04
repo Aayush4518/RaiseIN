@@ -60,6 +60,8 @@ export default function AboutPage() {
               className="text-xl text-gray-300 max-w-3xl mx-auto"
             >
               Empowering individuals and communities to create positive change through crowdfunding
+              <br />
+              <span className="text-sm font-bold">*All the stats on this page are just for illustration purposes*</span>
             </motion.p>
           </div>
         </section>

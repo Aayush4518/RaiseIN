@@ -83,17 +83,17 @@ export default function ContactPage() {
                 {
                   icon: "📧",
                   title: "Email",
-                  value: "support@raisein.com",
+                  value: "aayushs290107@gmail.com",
                 },
                 {
                   icon: "📞",
                   title: "Phone",
-                  value: "+1 (555) 123-4567",
+                  value: "+91 7347333185",
                 },
                 {
                   icon: "📍",
                   title: "Location",
-                  value: "New York, USA",
+                  value: "Bangalore, India",
                 },
               ].map((contact, idx) => (
                 <motion.div
