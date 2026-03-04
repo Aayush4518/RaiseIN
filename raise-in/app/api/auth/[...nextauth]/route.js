@@ -11,7 +11,7 @@ async function handle(req, context) {
   try {
     const url = req.nextUrl ? req.nextUrl.href : req.url;
     const query = req.nextUrl ? req.nextUrl.searchParams.toString() : new URL(req.url).search;
-    console.log('Auth route:', req.method, url, 'query', query, 'params', context?.params);
+    // console.log('Auth route:', req.method, url, 'query', query, 'params', context?.params);
   } catch {}
   const ip =
     req.headers.get('x-forwarded-for') || req.socket?.remoteAddress ||

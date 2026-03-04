@@ -650,7 +650,7 @@ export const SignInPage = ({
                       <button
                         onClick={() => signIn('google', { callbackUrl: '/home' })}
                         className="backdrop-blur-[2px] w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-full py-3 px-4 transition-colors">
-                        <span className="text-lg"> <img className="w-7" src="https://logos-world.net/wp-content/uploads/2020/09/Google-Symbol.png" alt="GoogleLogo"/> </span>
+                        <span className="text-lg"> <img className="w-6" src="https://freelogopng.com/images/all_img/1657952440google-logo-png-transparent.png" alt="GoogleLogo"/> </span>
                         <span>Sign in with Google</span>
                       </button>
                       
