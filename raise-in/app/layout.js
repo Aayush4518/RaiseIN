@@ -15,6 +15,9 @@ const raleway = Raleway({
 export const metadata = {
   title: "RaiseIN",
   description: "Helping Hands, Changing Lives",
+  verification: {
+    google: "FwcMpT2gilEoGyHuXGI0ebPuCfzpq6Zvaq5r76-lV54",
+  },
 };
 
 export default function RootLayout({ children }) {
